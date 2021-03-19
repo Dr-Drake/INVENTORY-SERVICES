@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: images-depl
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: images
+    template:
+        metadata:
+            labels:
+                app: images
+        spec:
+            containers:
+                - name: images
+                  #image: us.gcr.io/inventory-dev-292712/images
+                  image: dr-drake/images

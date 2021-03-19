@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: branches-depl
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: branches
+    template:
+        metadata:
+            labels:
+                app: branches
+        spec:
+            containers:
+                - name: branches
+                  #image: us.gcr.io/inventory-dev-292712/branches
+                  image: registry.cloud.okteto.net/dr-drake/branches:node

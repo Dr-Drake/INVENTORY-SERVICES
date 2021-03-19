@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: images-srv
+spec:
+    type: ClusterIP
+    selector:
+        app: images
+    ports:
+        - name: images
+          protocol: TCP
+          port: 7579
+          targetPort: 7579

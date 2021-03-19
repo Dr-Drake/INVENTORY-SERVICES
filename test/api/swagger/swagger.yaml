@@ -1,0 +1,1033 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Accounts Service
+# during dev, should point to your local machine
+host: 12.96.91.34.bc.googleusercontent.com
+# basePath prefixes all resource paths 
+basePath: /api/accounts
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: Should be formatted this way - "Bearer <access_token>"
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+    description: This is for refreshing the access token. Note that swagger does not support this function.
+    
+    
+  
+  
+paths:
+  /ownerauthentication:
+    post:
+      description: Authenticates the merchant.
+      summary: Authenticate owner
+      operationId: ownerAuthentication
+      parameters:
+        - name: OwnerAuthenticationRequest
+          in: body
+          description: The request parameters
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                enum: [IntroTech, Hubmart, Techmart]
+                example: IntroTech
+              password:
+                type: string
+                format: password
+                example: "123456"
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+                description: The access token used to make calls to other APIs.
+              inventory:
+                type: string
+                description: The name of the owner's inventory.
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+    
+  /staffauthentication:
+    post:
+      description: Authenticates the inventory staff.
+      summary: Authenticate staff / user.
+      operationId: staffAuthenticattion
+      parameters:
+        - name: StaffAuthenticationRequest
+          in: body
+          description: The request parameters
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+                format: password
+              inventory:
+                type: string
+                description: The inventory that the user has access to.
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+                description: The access token used to make calls to other APIs.
+              user:
+                type: string
+                description: The name of the staff / user.
+              inventory:
+                type: string
+                description: The inventory associated with the user.
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+  
+  /confirmation:
+    post:
+      description: Resends confirmation email for newly created user.
+      summary: Send confirmation email.
+      operationId: confirmEmail
+      parameters:
+        - name: ConfirmationRequest
+          in: body
+          description: The request parameters
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              redirectUri:
+                type: string
+                description: The uri to redirect to once user clicks confirmation link.
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message.
+              messageId:
+                type: string
+                description: The message ID of the email sent.
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+  /refreshtoken:
+    get:
+      description: Uses refresh token in cookie to fetch a new token.
+      summary: Refreshes access token.
+      operationId: refreshToken
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+                description: The access token used to make calls to other APIs.
+              inventory:
+                type: string
+                description: The inventory associated with the user.
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+  /inventory:
+    post:
+      security:
+        - bearerAuth: []
+      description: It creates an inventory for the merchant.
+      summary: Creates an inventory for the mecrhant.
+      operationId: createInventory
+      
+      parameters:
+        - name: InventoryPostRequest
+          in: body
+          description: The request parameters
+          required: true
+          schema:
+            type: object
+            properties:
+              inventory:
+                type: string
+                description: The name you want to give the inventory.
+    
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              owner:
+                type: string
+                description: The name of the merchant that just created the inventory.
+              message:
+                type: string
+                description: The success message.
+                
+                
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+    
+    
+    delete:
+      security:
+        - bearerAuth: []
+      description: It deletes an inventory for the merchant.
+      summary: Deletes inventory.
+      operationId: deleteInventoryQuery
+      
+      parameters:
+        - in: query
+          name: inventory
+          required: true
+          type: string
+          description: The name of the inventory.
+    
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message
+              result:
+                type: object
+                description: The result of the query
+              owner:
+                type: string
+                description: The name of the merchant that created the inventory.
+                
+                
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+        
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string 
+   
+   
+  /inventory/{inventory}:
+    delete:
+      security:
+        - bearerAuth: []
+      description: It deletes an inventory for the merchant.
+      summary: Deletes inventory.
+      operationId: deleteInventory
+      
+      parameters:
+        - in: path
+          name: inventory
+          required: true
+          type: string
+          description: The name of the inventory.
+    
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message
+              result:
+                type: object
+                description: The result of the query
+              owner:
+                type: string
+                description: The name of the merchant that created the inventory.
+                
+                
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string        
+                
+  
+  /user:
+    get:
+      security:
+        - bearerAuth: []
+      description: It gets the user(s) created for an inventory.
+      summary: Gets user(s).
+      operationId: getUser
+      
+      parameters:
+        - in: query
+          name: inventory
+          required: true
+          type: string
+          description: The name of the inventory.
+        
+        - in: query
+          name: email
+          required: false
+          type: string
+          format: email
+          description: The email of the user
+          
+        - in: query
+          name: name
+          required: false
+          type: string
+          description: The name of the user
+          
+        - in: query
+          name: role
+          required: false
+          type: string
+          description: The role of the user.
+          
+        - in: query
+          name: confirmed
+          required: false
+          type: string
+          description: The confirmation status of the user.
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user.
+            
+                name:
+                  type: string
+                  description: The name of the user.
+                  
+                inventory:
+                  type: string
+                  description: The inventory that the user belongs to.
+      
+                role:
+                  type: string
+                  description: The role of the user.
+                  enum: [superadmin, admin, custom, teller]
+                  example: custom
+                  
+                permissions:
+                  type: array
+                  description: Should be populated when ONLY when using the custom role.
+                  items:
+                    type: string
+                    enum: ["readUsers", "readProducts", 
+    "readBranches", "readTerminals", 
+    "readCategories", "readPurchases",
+    "readImages", "createUsers", "updateUsers",
+    "createProducts","updateProducts", 
+    "createBranches", "updateBranches",
+    "createTerminals", "updateTerminals",
+    "createCategories", "updateCategories",
+    "createImages", "updateImages", "deleteProducts", "deleteCategories", 
+    "deleteTerminals", "deleteUsers", "deleteBranches",
+    "deleteImages"]
+                    example: readUsers, createUsers, updateUsers
+                confirmed:
+                  type: boolean
+                  description: The confirmation status of the user.
+                
+            description: An arry of users.
+            
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+                
+                
+  
+    post:
+      security:
+        - bearerAuth: []
+      description: Creates user for an inventory.
+      summary: Create user(s).
+      operationId: createUser
+      
+      parameters:
+        - in: body
+          name: UserPostRequest
+          required: true
+          description: The user request.
+          schema:
+            properties:
+              email:
+                type: string
+                format: email
+                description: Email of the user.
+              password:
+                type: string
+                format: password
+              name:
+                type: string
+                description: The name of the user.
+              inventory:
+                type: string
+                description: The inventory that the user is being created for.
+              role:
+                type: string
+                description: The role of the user.
+                enum: [superadmin, admin, custom, teller]
+                example: custom
+              permissions:
+                  type: array
+                  description: Should be populated when ONLY when using the custom role.
+                  items:
+                    type: string
+                    enum: ["readUsers", "readProducts", 
+    "readBranches", "readTerminals", 
+    "readCategories", "readPurchases",
+    "readImages", "createUsers", "updateUsers",
+    "createProducts","updateProducts", 
+    "createBranches", "updateBranches",
+    "createTerminals", "updateTerminals",
+    "createCategories", "updateCategories",
+    "createImages", "updateImages", "deleteProducts", "deleteCategories", 
+    "deleteTerminals", "deleteUsers", "deleteBranches",
+    "deleteImages"]
+                    example: readUsers, createUsers, updateUsers
+              redirectUri:
+                type: string
+                description: The URI to redirect to after user confirms email.
+              
+        
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message
+              email_info:
+                type: object
+                description: The information of the email sent.
+              
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string 
+      
+    
+    put:
+      security:
+        - bearerAuth: []
+      description: Updates user for an inventory.
+      summary: Update user.
+      operationId: updateUser
+      
+      parameters:
+        - in: body
+          name: UserUpdateRequest
+          required: true
+          description: The user request.
+          schema:
+            properties:
+              email:
+                type: string
+                format: email
+                description: Email of the user.
+              inventory:
+                type: string
+                description: The inventory that the user is being created for.
+              name:
+                type: string
+                description: The name of the user.
+              role:
+                type: string
+                description: The role of the user.
+                enum: [superadmin, admin, custom, teller]
+                example: custom
+              permissions:
+                  type: array
+                  description: Should be populated when ONLY when using the custom role.
+                  items:
+                    type: string
+                    enum: ["readUsers", "readProducts", 
+    "readBranches", "readTerminals", 
+    "readCategories", "readPurchases",
+    "readImages", "createUsers", "updateUsers",
+    "createProducts","updateProducts", 
+    "createBranches", "updateBranches",
+    "createTerminals", "updateTerminals",
+    "createCategories", "updateCategories",
+    "createImages", "updateImages", "deleteProducts", "deleteCategories", 
+    "deleteTerminals", "deleteUsers", "deleteBranches",
+    "deleteImages"]
+                    example: readUsers, createUsers, updateUsers
+              
+        
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string   
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+    
+    delete:
+      security:
+        - bearerAuth: []
+      description: Deletes user in an inventory.
+      summary: Delete user.
+      operationId: DeleteUser
+      
+      parameters:
+        - in: query
+          name: inventory
+          type: string
+          required: true
+          description: The user request.
+          
+        - in: query
+          name: email
+          type: string
+          format: email
+          required: true
+          description: Email of the user you want to delete.
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message.
+              result:
+                type: object
+                description: The result of the query.
+                
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+            
+              
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+  
+  
+  /user/{inventory}:
+    get:
+      security:
+        - bearerAuth: []
+      description: Get all users for the specified inventory.
+      summary: Get all users.
+      operationId: getAllUserInventory
+      
+      parameters:
+        - in: path
+          name: inventory
+          required: true
+          type: string
+          description: The name of the inventory.
+    
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user.
+            
+                name:
+                  type: string
+                  description: The name of the user.
+                  
+                inventory:
+                  type: string
+                  description: The inventory that the user belongs to.
+      
+                role:
+                  type: string
+                  description: The role of the user.
+                  enum: [superadmin, admin, custom, teller]
+                  example: custom
+                  
+                permissions:
+                  type: array
+                  description: Should be populated when ONLY when using the custom role.
+                  items:
+                    type: string
+                    enum: ["readUsers", "readProducts", 
+    "readBranches", "readTerminals", 
+    "readCategories", "readPurchases",
+    "readImages", "createUsers", "updateUsers",
+    "createProducts","updateProducts", 
+    "createBranches", "updateBranches",
+    "createTerminals", "updateTerminals",
+    "createCategories", "updateCategories",
+    "createImages", "updateImages", "deleteProducts", "deleteCategories", 
+    "deleteTerminals", "deleteUsers", "deleteBranches",
+    "deleteImages"]
+                    example: readUsers, createUsers, updateUsers
+                confirmed:
+                  type: boolean
+                  description: The confirmation status of the user.
+                
+            description: An arry of users.
+            
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+    
+  /user/{inventory}/{identifier}:
+    get:
+      security:
+        - bearerAuth: []
+      description: Get's user for the specified inventory via an identifier.
+      summary: Get's users.
+      operationId: getUserInventory
+      
+      parameters:
+        - in: path
+          name: inventory
+          required: true
+          type: string
+          description: The name of the inventory.
+          
+        - in: path
+          name: identifier
+          required: true
+          type: string
+          description: Any information identifying the user.
+          enum: [email, name, role, confirmed]
+          
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user.
+            
+                name:
+                  type: string
+                  description: The name of the user.
+                  
+                inventory:
+                  type: string
+                  description: The inventory that the user belongs to.
+      
+                role:
+                  type: string
+                  description: The role of the user.
+                  enum: [superadmin, admin, custom, teller]
+                  example: custom
+                  
+                permissions:
+                  type: array
+                  description: Should be populated when ONLY when using the custom role.
+                  items:
+                    type: string
+                    enum: ["readUsers", "readProducts", 
+    "readBranches", "readTerminals", 
+    "readCategories", "readPurchases",
+    "readImages", "createUsers", "updateUsers",
+    "createProducts","updateProducts", 
+    "createBranches", "updateBranches",
+    "createTerminals", "updateTerminals",
+    "createCategories", "updateCategories",
+    "createImages", "updateImages", "deleteProducts", "deleteCategories", 
+    "deleteTerminals", "deleteUsers", "deleteBranches",
+    "deleteImages"]
+                    example: readUsers, createUsers, updateUsers
+                confirmed:
+                  type: boolean
+                  description: The confirmation status of the user.
+                
+            description: An arry of users.
+            
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+                
+    delete:
+      security:
+        - bearerAuth: []
+      description: Deletes user in an inventory via email.
+      summary: Delete user via email.
+      operationId: DeleteInventoryUser
+      
+      parameters:
+        - in: path
+          name: inventory
+          type: string
+          required: true
+          description: The user request.
+          
+        - in: path
+          name: identifier
+          type: string
+          format: email
+          required: true
+          description: The identifier in this case is the user's email.
+    
+      
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: The success message.
+              result:
+                type: object
+                description: The result of the query.
+            
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string     
+              
+        "401":
+          description: Unauthorized
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string
+                
+      
+        "403":
+          description: Forbidden
+          schema:
+            type: object
+            properties:
+              error:
+                type: number
+              message:
+                type: string

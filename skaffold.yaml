@@ -1,0 +1,54 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+    kubectl:
+        manifests:
+            - ./k8s/*
+build:
+    #local:
+       #push: false
+    #googleCloudBuild:
+        #projectId: inventory-dev-292712
+    tagPolicy:
+        gitCommit: {}  # use git commit policy
+    artifacts:
+        - image: dr-drake/accounts #us.gcr.io/inventory-dev-292712/accounts
+          context: User
+          docker:
+            dockerfile: Dockerfile 
+          sync:
+            manual:
+                - src: 'index.js'
+                  dest: .
+        - image: dr-drake/branches #us.gcr.io/inventory-dev-292712/branches
+          context: Branch
+          docker:
+            dockerfile: Dockerfile 
+          sync:
+            manual:
+                - src: 'index.js'
+                  dest: .
+        - image: dr-drake/products #us.gcr.io/inventory-dev-292712/products
+          context: Product
+          docker:
+            dockerfile: Dockerfile 
+          sync:
+            manual:
+                - src: 'index.js'
+                  dest: .
+        - image: dr-drake/images #us.gcr.io/inventory-dev-292712/images
+          context: Image
+          docker:
+            dockerfile: Dockerfile 
+          sync:
+            manual:
+                - src: 'index.js'
+                  dest: .
+        - image: dr-drake/categories #us.gcr.io/inventory-dev-292712/categories
+          context: Category
+          docker:
+            dockerfile: Dockerfile 
+          sync:
+            manual:
+                - src: 'index.js'
+                  dest: .

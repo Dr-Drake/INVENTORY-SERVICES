@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+    name: ingress-srv
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/use-regex: 'true'
+        dev.okteto.com/generate-host: "true"
+spec:
+    rules:
+        #- host: 12.96.91.34.bc.googleusercontent.com
+        - http:
+            paths: 
+                - path: /api/accounts/inventory/?(.*)
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /api/accounts/staffauthentication
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /api/accounts/ownerauthentication
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /api/accounts/confirmation
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /api/accounts/refreshToken
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /api/accounts/user/?(.*)/?(.*)
+                  backend:
+                    serviceName: accounts-srv
+                    servicePort: 8080
+                - path: /images/?(.*)/?(.*)
+                  backend:
+                    serviceName: images-srv
+                    servicePort: 7579
+                - path: /
+                  backend:
+                    serviceName: images-srv
+                    servicePort: 7579
+                - path: /api/categories/?(.*)/?(.*)
+                  backend:
+                    serviceName: categories-srv
+                    servicePort: 7577
+                - path: /api/products/?(.*)/?(.*)
+                  backend:
+                    serviceName: products-srv
+                    servicePort: 7576
+                - path: /api/branches/?(.*)/?(.*)
+                  backend:
+                    serviceName: branches-srv
+                    servicePort: 7578

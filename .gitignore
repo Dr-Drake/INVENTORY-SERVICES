@@ -1,0 +1,11 @@
+/User/.env
+/User/node_modules/
+/Branch/.env
+/Branch/node_modules/
+/Category/.env
+/Category/node_modules/
+/Image/.env
+/Image/node_modules/
+/Product/.env
+/Product/node_modules/
+.vscode

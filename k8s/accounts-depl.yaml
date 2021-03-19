@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: accounts-depl
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: accounts
+    template:
+        metadata:
+            labels:
+                app: accounts
+        spec:
+            containers:
+                - name: accounts
+                  #image: us.gcr.io/inventory-dev-292712/accounts
+                  image: registry.cloud.okteto.net/dr-drake/accounts:node
